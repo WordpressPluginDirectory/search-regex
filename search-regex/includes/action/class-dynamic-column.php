@@ -17,67 +17,61 @@ class Dynamic_Column {
 	 *
 	 * @var string[]
 	 */
-	private $shortcodes;
+	private array $shortcodes;
 
 	/**
 	 * Array of standard WP shortcodes
 	 *
 	 * @var string[]
 	 */
-	private $old_shortcodes = [];
+	private array $old_shortcodes = [];
 
 	/**
 	 * Row ID
-	 *
-	 * @var integer
 	 */
-	private $row_id = 0;
+	private int $row_id = 0;
 
 	/**
 	 * Row value
-	 *
-	 * @var string
 	 */
-	private $row_value = '';
+	private string $row_value = '';
 
 	/**
 	 * Raw row data
 	 *
-	 * @var string[]
+	 * @var array<string, mixed>
 	 */
-	private $raw = [];
+	private array $raw = [];
 
 	/**
 	 * Source schema
-	 *
-	 * @var Schema\Source|null
 	 */
-	private $schema = null;
+	private ?Schema\Source $schema = null;
 
 	/**
 	 * Recursion level protection
-	 *
-	 * @var integer
 	 */
-	private $level = 0;
+	private int $level = 0;
 
 	public function __construct() {
 		add_filter( 'searchregex_text', [ $this, 'replace_text' ], 10, 5 );
 
-		$this->shortcodes = apply_filters( 'searchregex_shortcodes', [
-			'md5',
-			'upper',
-			'lower',
-			'dashes',
-			'underscores',
-			'column',
-			'value',
-			'date',
-		] );
+		$this->shortcodes = apply_filters(
+			'searchregex_shortcodes', [
+				'md5',
+				'upper',
+				'lower',
+				'dashes',
+				'underscores',
+				'column',
+				'value',
+				'date',
+			]
+		);
 
 		global $shortcode_tags;
 
-		$this->old_shortcodes = array_merge( [], $shortcode_tags );
+		$this->old_shortcodes = [ ...$shortcode_tags ];
 
 		remove_all_shortcodes();
 
@@ -87,21 +81,20 @@ class Dynamic_Column {
 	}
 
 	public function __destruct() {
-		/** @psalm-suppress all */
 		global $shortcode_tags;
 
 		// Restore shortcodes
 		// phpcs:ignore
-		$shortcode_tags = array_merge( [], $this->old_shortcodes );
+		$shortcode_tags = [ ...$this->old_shortcodes ];
 	}
 
 	/**
 	 * Replace shortcodes in a value
 	 *
 	 * @param string        $text Replacement text, including shortcodes.
-	 * @param integer       $row_id Row ID.
+	 * @param int       $row_id Row ID.
 	 * @param string        $row_value Row value.
-	 * @param string[]      $raw Raw row data.
+	 * @param array<string, mixed>      $raw Raw row data.
 	 * @param Schema\Source $schema Schema.
 	 * @return string
 	 */
@@ -119,8 +112,8 @@ class Dynamic_Column {
 	/**
 	 * Peform a shortcode
 	 *
-	 * @param array  $attrs Shortcode attributes.
-	 * @param string $content Shortcode content.
+	 * @param array<string, mixed>|array<int, string> $attrs Shortcode attributes.
+	 * @param string|null $content Shortcode content.
 	 * @param string $tag Shortcode tag.
 	 * @return string
 	 */
@@ -136,22 +129,22 @@ class Dynamic_Column {
 
 		switch ( $tag ) {
 			case 'md5':
-				return md5( do_shortcode( $content ) );
+				return md5( do_shortcode( $content ?? '' ) );
 
 			case 'upper':
-				return strtoupper( do_shortcode( $content ) );
+				return strtoupper( do_shortcode( $content ?? '' ) );
 
 			case 'lower':
-				return strtolower( do_shortcode( $content ) );
+				return strtolower( do_shortcode( $content ?? '' ) );
 
 			case 'dashes':
-				return str_replace( [ '_', ' ' ], '-', do_shortcode( $content ) );
+				return str_replace( [ '_', ' ' ], '-', do_shortcode( $content ?? '' ) );
 
 			case 'underscores':
-				return str_replace( [ '-', ' ' ], '_', do_shortcode( $content ) );
+				return str_replace( [ '-', ' ' ], '_', do_shortcode( $content ?? '' ) );
 
 			case 'date':
-				return date( isset( $attrs['format'] ) ? $attrs['format'] : 'r' );
+				return gmdate( $attrs['format'] ?? 'r' );
 
 			case 'value':
 				return $this->row_value;
@@ -183,9 +176,6 @@ class Dynamic_Column {
 				return '';
 		}
 
-		/**
-		 * @psalm-suppress TooManyArguments
-		 */
 		return apply_filters( 'searchregex_do_shortcode', '', $tag, $attrs, $content );
 	}
 
@@ -193,15 +183,15 @@ class Dynamic_Column {
 	 * Get schema join
 	 *
 	 * @param Schema\Column $schema Schema.
-	 * @param integer       $row_id Row ID.
-	 * @param array         $attrs Shortcode attributes.
+	 * @param int       $row_id Row ID.
+	 * @param array<string, mixed>         $attrs Shortcode attributes.
 	 * @return string
 	 */
 	private function get_schema_join( Schema\Column $schema, $row_id, array $attrs ) {
-		$format = isset( $attrs['format'] ) ? $attrs['format'] : 'label';
+		$format = $attrs['format'] ?? 'label';
 
 		if ( $schema->get_column() === 'category' || $schema->get_column() === 'post_tag' ) {
-			$seperator = isset( $attrs['seperator'] ) ? $attrs['seperator'] : ', ';
+			$seperator = $attrs['seperator'] ?? ', ';
 			$join = new Sql\Join\Term( $schema->get_column() );
 
 			return $join->get_value( $row_id, $format, $seperator );
@@ -214,13 +204,13 @@ class Dynamic_Column {
 	 * Get a label from a schema column
 	 *
 	 * @param Schema\Column $schema Schema.
-	 * @param array         $attrs Shortcode attributes.
+	 * @param array<string, mixed>         $attrs Shortcode attributes.
 	 * @param string        $row_value Row value.
 	 * @return string
 	 */
 	private function get_schema_value( Schema\Column $schema, array $attrs, $row_value ) {
 		if ( $schema->get_type() === 'date' && isset( $attrs['format'] ) ) {
-			return date( $attrs['format'], intval( mysql2date( 'U', $row_value ), 10 ) );
+			return gmdate( $attrs['format'], intval( mysql2date( 'U', $row_value ), 10 ) );
 		}
 
 		if ( $schema->get_type() === 'member' && isset( $attrs['format'] ) && $attrs['format'] === 'label' ) {
@@ -231,7 +221,7 @@ class Dynamic_Column {
 			}
 		}
 
-		if ( $schema->get_joined_by() || $schema->get_join_column() ) {
+		if ( $schema->get_joined_by() !== null || $schema->get_join_column() !== null ) {
 			$convert = new Source\Convert_Values();
 
 			return $convert->convert( $schema, $row_value );

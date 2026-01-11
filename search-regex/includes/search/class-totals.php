@@ -13,21 +13,19 @@ class Totals {
 	 *
 	 * @var array<string,array{rows: int, matched_rows: int}>
 	 */
-	private $totals = [];
+	private array $totals = [];
 
 	/**
 	 * `true` if we have a regex search anywhere, `false` othewise
-	 *
-	 * @var boolean
 	 */
-	private $has_advanced = false;
+	private bool $has_advanced = false;
 
 	/**
 	 * The grand totals across all sources
 	 *
 	 * @var array{rows: int, matched_rows: int}
 	 */
-	private $grand_totals = [
+	private array $grand_totals = [
 		'rows' => 0,
 		'matched_rows' => 0,
 	];
@@ -39,9 +37,9 @@ class Totals {
 	 * @return void
 	 */
 	private function set_advanced( array $sources ) {
-		$advanced = array_filter( $sources, function( $source ) {
-			return $source->has_advanced_filter();
-		} );
+		$advanced = array_filter(
+			$sources, fn( $source ) => $source->has_advanced_filter()
+		);
 
 		$this->has_advanced = count( $advanced ) > 0;
 	}
@@ -50,7 +48,7 @@ class Totals {
 	 * Get total number of matches and rows across each source
 	 *
 	 * @param array<Source\Source> $sources Sources.
-	 * @return \WP_Error|Bool Array of totals
+	 * @return \WP_Error|bool Array of totals
 	 */
 	public function get_totals( array $sources ) {
 		$this->set_advanced( $sources );
@@ -102,7 +100,7 @@ class Totals {
 	/**
 	 * Get total rows for a source
 	 *
-	 * @param String $source_name Source name.
+	 * @param string $source_name Source name.
 	 * @return integer Number of matches for the row
 	 */
 	public function get_total_rows_for_source( $source_name ) {
@@ -116,8 +114,8 @@ class Totals {
 	/**
 	 * Get total matched rows for a source
 	 *
-	 * @param String $source_name Source name.
-	 * @return Int Number of matches for the row
+	 * @param string $source_name Source name.
+	 * @return int Number of matches for the row
 	 */
 	public function get_matched_rows_for_source( $source_name ) {
 		if ( $this->has_advanced ) {
@@ -134,8 +132,8 @@ class Totals {
 	/**
 	 * Get the next page offset.
 	 *
-	 * @param Int $next_offset The offset of the next page.
-	 * @return Int|false Next offset, or false if no next offset
+	 * @param int $next_offset The offset of the next page.
+	 * @return int|false Next offset, or false if no next offset
 	 */
 	public function get_next_page( $next_offset ) {
 		if ( $this->has_advanced ) {

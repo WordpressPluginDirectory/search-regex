@@ -2,11 +2,10 @@
 
 namespace SearchRegex\Schema;
 
-require_once __DIR__ . '/class-source.php';
-require_once __DIR__ . '/class-column.php';
-
 /**
  * Helper object to load a source schema and provide access functions
+ *
+ * @phpstan-import-type SourceSchemaJson from Source
  */
 class Schema {
 	/**
@@ -14,14 +13,14 @@ class Schema {
 	 *
 	 * @var array<string, Source>
 	 */
-	private $schema = [];
+	private array $schema = [];
 
 	/**
 	 * Constructor
 	 *
-	 * @param array $source_schema JSON schema.
+	 * @param list<SourceSchemaJson> $source_schema JSON schema.
 	 */
-	public function __construct( array $source_schema ) {
+	public function __construct( $source_schema ) {
 		foreach ( $source_schema as $schema ) {
 			$schema = new Source( $schema );
 
@@ -38,11 +37,7 @@ class Schema {
 	 * @return Source|null
 	 */
 	public function get_for_source( $source_name ) {
-		if ( isset( $this->schema[ $source_name ] ) ) {
-			return $this->schema[ $source_name ];
-		}
-
-		return null;
+		return $this->schema[ $source_name ] ?? null;
 	}
 
 	/**

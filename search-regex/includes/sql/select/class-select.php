@@ -4,40 +4,31 @@ namespace SearchRegex\Sql\Select;
 
 use SearchRegex\Sql;
 
-require_once __DIR__ . '/class-column.php';
-
 /**
  * SQL SELECT
  */
 class Select {
 	/**
 	 * Column name
-	 *
-	 * @var string
 	 */
-	protected $column;
+	protected string $column;
 
 	/**
 	 * Column alias
 	 *
 	 * @readonly
-	 * @var string|null
 	 */
-	protected $alias = null;
+	protected ?string $alias;
 
 	/**
 	 * Table name
-	 *
-	 * @var string
 	 */
-	protected $table;
+	protected string $table;
 
 	/**
 	 * SQL prefix
-	 *
-	 * @var boolean
 	 */
-	protected $prefix_sql = false;
+	protected bool $prefix_sql = false;
 
 	/**
 	 * Constructor
@@ -47,7 +38,7 @@ class Select {
 	 * @param Sql\Value|null $alias Table alias.
 	 * @param boolean        $prefix_required Whether we need to prefix the SQL with the table name.
 	 */
-	public function __construct( Sql\Value $table, Sql\Value $column, Sql\Value $alias = null, $prefix_required = false ) {
+	public function __construct( Sql\Value $table, Sql\Value $column, $alias = null, $prefix_required = false ) {
 		$this->table = $table->get_value();
 		$this->column = $column->get_value();
 		$this->alias = $alias ? $alias->get_value() : null;

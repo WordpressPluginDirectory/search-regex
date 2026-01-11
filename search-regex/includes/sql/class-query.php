@@ -9,70 +9,62 @@ class Query {
 	/**
 	 * Array of Where\Where objects
 	 *
-	 * @var array
+	 * @var Where\Where[]
 	 */
-	private $where = [];
+	private array $where = [];
 
 	/**
 	 * Array of Select\Select objects
 	 *
 	 * @var Select\Select[]
 	 */
-	private $select = [];
+	private array $select = [];
 
 	/**
 	 * Array of From objects
 	 *
 	 * @var From[]
 	 */
-	private $from = [];
+	private array $from = [];
 
 	/**
 	 * Array of group objects
 	 *
 	 * @var Group[]
 	 */
-	private $group = [];
+	private array $group = [];
 
 	/**
 	 * Array of joins
 	 *
 	 * @var Join\Join[]
 	 */
-	private $joins = [];
+	private array $joins = [];
 
 	/**
 	 * Current page offset
-	 *
-	 * @var integer|null
 	 */
-	private $offset = null;
+	private ?int $offset = null;
 
 	/**
 	 * Query limit
-	 *
-	 * @var integer|null
 	 */
-	private $limit = null;
+	private ?int $limit = null;
 
 	/**
 	 * Query order
-	 *
-	 * @var string|null
 	 */
-	private $order = null;
+	private ?string $order = null;
 
 	/**
 	 * Query order direction
-	 *
-	 * @var String
 	 */
-	private $order_direction = 'ASC';
+	private string $order_direction = 'ASC';
 
 	/**
 	 * Set the query order
 	 *
-	 * @param String       $order Column to order on.
+	 * @param string       $order Column to order on.
 	 * @param 'ASC'|'DESC' $order_direction Direction of ordering.
 	 * @return void
 	 */
@@ -122,7 +114,7 @@ class Query {
 	 * @return list<Where\Where>
 	 */
 	public function get_where() {
-		return $this->where;
+		return array_values( $this->where );
 	}
 
 	/**
@@ -219,7 +211,7 @@ class Query {
 	 * @param Modifier\Modifier|null $modifier Modifier for the query.
 	 * @return string
 	 */
-	public function get_as_sql( Modifier\Modifier $modifier = null ) {
+	public function get_as_sql( $modifier = null ) {
 		global $wpdb;
 
 		if ( $modifier === null ) {
@@ -259,7 +251,7 @@ class Query {
 	 * Get a group of SQL statements with a space between them
 	 *
 	 * @param string $label SQL label.
-	 * @param array  $values Group of statements.
+	 * @param string[] $values Group of statements.
 	 * @param string $separator Seperator for statements.
 	 * @return array<string>
 	 */

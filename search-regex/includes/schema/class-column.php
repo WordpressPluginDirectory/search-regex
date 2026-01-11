@@ -4,61 +4,66 @@ namespace SearchRegex\Schema;
 
 /**
  * Helper to represent the schema for a column
+ *
+ * @phpstan-type ColumnType 'integer'|'string'|'date'|'member'|'keyvalue'
+ * @phpstan-type ColumnOption array{value: string, label: string}
+ * @phpstan-type ColumnSchemaJson array{
+ *   column?: string,
+ *   type?: ColumnType,
+ *   global?: bool,
+ *   join?: string,
+ *   joined_by?: string,
+ *   options?: list<ColumnOption>
+ * }
  */
 class Column {
 	/**
 	 * Column name
-	 *
-	 * @var string
 	 */
-	private $column = '';
+	private string $column = '';
 
 	/**
 	 * Column type
 	 *
-	 * @var 'integer'|'string'|'date'|'member'|'keyvalue'
+	 * @var ColumnType
 	 */
-	private $type = 'string';
+	private string $type = 'string';
 
 	/**
 	 * Is this a global column?
-	 *
-	 * @var boolean
 	 */
-	private $global = false;
+	private bool $global = false;
 
 	/**
 	 * Join column, if any
 	 *
 	 * @var string
 	 */
-	private $join = '';
+	private string $join = '';
 
 	/**
 	 * Joined by column
 	 *
 	 * @var string
 	 */
-	private $joined_by = '';
+	private string $joined_by = '';
 
 	/**
 	 * Any options, if this is a member type
 	 *
-	 * @var array<array{value: string, label: string}>
+	 * @var list<ColumnOption>
 	 */
-	private $options = [];
+	private array $options = [];
 
 	/**
 	 * Source name for this column
-	 *
-	 * @var Source
 	 */
-	private $source;
+	private Source $source;
 
 	/**
 	 * Constructor
 	 *
-	 * @param array  $schema JSON.
+	 * @param ColumnSchemaJson $schema JSON.
 	 * @param Source $source Source.
 	 */
 	public function __construct( $schema, Source $source ) {
@@ -84,6 +89,7 @@ class Column {
 			$this->joined_by = $schema['joined_by'];
 		}
 
+		// @phpstan-ignore booleanAnd.rightAlwaysTrue
 		if ( isset( $schema['options'] ) && is_array( $schema['options'] ) ) {
 			$this->options = $schema['options'];
 		}
@@ -110,7 +116,7 @@ class Column {
 	/**
 	 * Get column type
 	 *
-	 * @return string
+	 * @return ColumnType
 	 */
 	public function get_type() {
 		return $this->type;
@@ -146,7 +152,7 @@ class Column {
 	/**
 	 * Get column options
 	 *
-	 * @return array
+	 * @return list<ColumnOption>
 	 */
 	public function get_options() {
 		return $this->options;

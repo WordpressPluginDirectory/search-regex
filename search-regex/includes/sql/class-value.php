@@ -11,9 +11,8 @@ class Value {
 	 * Underlying value
 	 *
 	 * @readonly
-	 * @var string
 	 */
-	private $value;
+	private string $value;
 
 	/**
 	 * Constructor
@@ -50,7 +49,7 @@ class Value {
 	 * @return Value
 	 */
 	public static function column( $column ) {
-		$column = preg_replace( '/[^ A-Za-z0-9_\-\.]/', '', $column );
+		$column = (string) preg_replace( '/[^ A-Za-z0-9_\-\.]/', '', $column );
 
 		return new Value( $column );
 	}
@@ -62,7 +61,7 @@ class Value {
 	 * @return Value
 	 */
 	public static function table( $table ) {
-		$table = preg_replace( '/[^A-Za-z0-9_\-]/', '', $table );
+		$table = (string) preg_replace( '/[^A-Za-z0-9_\-]/', '', $table );
 
 		return new Value( $table );
 	}
